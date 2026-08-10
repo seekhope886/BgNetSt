@@ -1,3 +1,82 @@
+# Background Network Status Guard
+
+### 📌 Overview
+**Background Network Status Guard** (`com.luckyh9h.bgnetst`) is a highly robust, non-visible extension designed for advanced background network monitoring in MIT App Inventor 2. It is specifically engineered to eliminate app crashes—especially those caused by third-party MQTT clients or web components executing requests under unpredictable network conditions within persistent background frameworks like **Itoo Sky 4.5**.
+
+By deploying a native Android Foreground Service, this extension actively tracks low-level network states and utilizes `NET_CAPABILITY_VALIDATED` to dynamically verify actual outbound internet traffic. Validated connection states are stored using multi-process secure preferences (`SharedPreferences`), ensuring your background tasks remain bulletproof against disconnections and silent background crashes.
+
+### ⚙️ Key Features
+* **Zero Screen Dependency (No-Screen)**: Operates 100% independently in the background even if the device enters Doze Mode or `Screen1` is completely stripped from memory by the OS.
+* **Captive Portal & Fake Connection Defuser**: Automatically sniffs out tricky "fake connections" (e.g., connected to a strong Wi-Fi router that has lost its backend internet access, or dead zones inside elevators).
+* **Multi-Process Compatible (Built for Itoo)**: Shatters Android's multi-process memory isolation barrier. It guarantees that any isolated background process cloned by Itoo can fetch identical, real-time connection telemetry instantly.
+* **Global Background Crash Buffer**: Features a global unhandled exception interceptor (`UncaughtExceptionHandler`) that catches erratic background thread crashes and consumes them silently, completely bypassing the dreaded "App has stopped working" system prompt.
+
+---
+
+### 📦 Extension Specifications
+* **Package Name**: `com.luckyh9h.bgnetst`
+* **Version**: `5.0`
+* **Category**: `Extension`
+* **Non-visible**: `True`
+* **Designer Icon**: `aiwebres/indeter_q_box_24.png`
+
+---
+
+### 🔒 Manifest Component Auto-Injection
+The extension utilizes built-in annotations to automate manifest manipulation. Upon importing the `.aix` into MIT App Inventor 2, the compiler will automatically append the following requirements to your app's `AndroidManifest.xml`:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+<uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+<service 
+    android:name="com.luckyh9h.bgnetst.BgNetSt$NetworkMonitorService"
+    android:enabled="true"
+    android:exported="false"
+    android:foregroundServiceType="specialUse" />
+```
+
+---
+
+### 🧱 Block Documentation
+
+#### Functions
+
+| Block Name | Description | Return Type |
+| :--- | :--- | :--- |
+| **StartNetworkService** | Spawns the underlying background network tracking Foreground Service. *Highly recommended to trigger this on `Screen1.Initialize`.* | *None* |
+| **StopNetworkService** | Terminates the Foreground Service completely and cleanly unregisters all system network callbacks. | *None* |
+| **IsInternetValid** | **[Core Feature]** Synchronously queries the latest verified outbound connectivity state. Entirely safe to embed inside high-frequency loops (such as Itoo background routines or native Clock components). | `Boolean` (`true` / `false`) |
+
+---
+
+### 🚀 Recommended Block Logic Implementation
+
+Whether you are designing for the main user interface or handling low-level Itoo Background Procedures, always treat this evaluation block as your primary defensive shield:
+
+```text
+When Itoo_Timer or Clock_Timer triggers:
+  If ( call BgNetSt1.IsInternetValid ) Then:
+      // [Safe Connectivity Zone] Android guarantees true internet availability here
+      If ( UrsPahoMqttClient1.IsConnected ) Then:
+          Call UrsPahoMqttClient1.Publish ( yourData )
+      Else:
+          Call UrsPahoMqttClient1.Connect ( attempt automatic reconnection )
+  Else:
+      // [Dangerous Offline Zone] Internet is down or in a fake connection state
+      // Quietly bypass this execution cycle. Do NOT call any MQTT triggers! App stays stable.
+```
+
+---
+
+### 📄 License
+This project is open-source and distributed under the terms of the **MIT License**. You are free to modify, distribute, and integrate this extension into commercial applications, provided that original authorship attribution to `com.luckyh9h` is preserved.
+
+-----------------------------
+<img width="24" height="24" alt="network_24" src="https://github.com/user-attachments/assets/42c7ea87-e3a6-436c-9ede-f181dd36154e" />
+
 # BgNetSt
 Check internet status for MIT AI2 extension
 
