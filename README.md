@@ -1,5 +1,5 @@
-# Background Network Status Guard
-<img width="24" height="24" alt="network_24" src="https://github.com/user-attachments/assets/42c7ea87-e3a6-436c-9ede-f181dd36154e" />
+# Background Network Status Guard<img width="24" height="24" alt="network_24" src="https://github.com/user-attachments/assets/42c7ea87-e3a6-436c-9ede-f181dd36154e" />
+
 ### 📌 Overview
 **Background Network Status Guard** (`com.luckyh9h.bgnetst`) is a highly robust, non-visible extension designed for advanced background network monitoring in MIT App Inventor 2. It is specifically engineered to eliminate app crashes—especially those caused by third-party MQTT clients or web components executing requests under unpredictable network conditions within persistent background frameworks like **Itoo Sky 4.5**.
 
